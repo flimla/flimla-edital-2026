@@ -40,9 +40,18 @@ function renderEmail(bodyHtml) {
     <tr><td align="center">
       <table role="presentation" width="100%" style="max-width:520px;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #ded4c7;">
         <tr>
-          <td style="background:#663821;padding:30px 24px;text-align:center;">
-            <img src="${LOGO_FLIMLA}" alt="Flimlá 2026" width="170" style="display:block;margin:0 auto 16px;border:0;">
-            <img src="${LOGO_INSTITUTO}" alt="Instituto Mãe Lalu" width="86" style="display:block;margin:0 auto;border:0;">
+          <td style="background:#663821;padding:22px 22px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="64" style="vertical-align:middle;">
+                  <img src="${LOGO_INSTITUTO}" alt="Instituto Mãe Lalu" width="52" style="display:block;border:0;">
+                </td>
+                <td style="vertical-align:middle;text-align:center;">
+                  <img src="${LOGO_FLIMLA}" alt="Flimlá 2026" width="190" style="display:block;margin:0 auto;border:0;">
+                </td>
+                <td width="64"></td>
+              </tr>
+            </table>
           </td>
         </tr>
         <tr>
@@ -51,9 +60,8 @@ function renderEmail(bodyHtml) {
           </td>
         </tr>
         <tr>
-          <td style="background:#F1ECE6;padding:18px 28px;font-size:12px;color:#6b5647;text-align:center;line-height:1.5;">
-            Instituto Mãe Lalu · Rio de Areia, Km 14 da BA-880, Santiago do Iguape, Cachoeira-BA<br>
-            <a href="mailto:flimla@institutomaelalu.org" style="color:#3f9aa3;">flimla@institutomaelalu.org</a>
+          <td style="background:#F1ECE6;padding:16px 28px;font-size:12px;color:#6b5647;text-align:center;">
+            Instituto Mãe Lalu · Santiago do Iguape · Cachoeira-BA
           </td>
         </tr>
       </table>
