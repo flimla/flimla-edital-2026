@@ -930,7 +930,7 @@
       <p class="prose" style="color:var(--ink-soft); font-size:.95rem;">Preencha um formulário por escola. Campos marcados com <strong>*</strong> são obrigatórios. Ao concluir, você recebe um número de protocolo — guarde-o.</p>
     </div>
 
-    <form class="form-shell" id="flimla-form" action="https://formspree.io/f/SEU_ENDPOINT_AQUI" method="POST" enctype="multipart/form-data" novalidate>
+    <form class="form-shell" id="flimla-form" novalidate>
 
       <div class="form-section">
         <div class="form-section-head"><span class="letter">A</span><h3>Identificação</h3></div>
@@ -1173,6 +1173,7 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 (function(){
   var form = document.getElementById('flimla-form');
@@ -1244,6 +1245,33 @@
     return 'FLIMLA-' + y + '-' + rand;
   }
 
+  var SUPABASE_URL = 'https://uklgjivsgljvkfvdnnqi.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_AJ0oX91NPtyzCgPgAvhOUQ_ojqi2tc4';
+  var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  function showSuccess(protocol){
+    protocolEl.textContent = protocol;
+    form.classList.add('leaving');
+    var prefersMotion = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    var delay = prefersMotion ? 250 : 0;
+    setTimeout(function(){
+      form.style.display = 'none';
+      successPanel.classList.add('show');
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ successPanel.classList.add('in'); });
+      });
+    }, delay);
+  }
+
+  function sanitizeFilename(name){
+    return name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9._-]/g, '_');
+  }
+
+  function intOrNull(v){
+    var n = parseInt(v, 10);
+    return isNaN(n) ? null : n;
+  }
+
   form.addEventListener('submit', function(e){
     e.preventDefault();
     msg.textContent = '';
@@ -1254,42 +1282,57 @@
       return;
     }
 
-    var endpoint = form.getAttribute('action') || '';
-    if(endpoint.indexOf('SEU_ENDPOINT_AQUI') !== -1){
-      msg.textContent = 'Formulário ainda não conectado a um endpoint de recebimento — veja a nota no código-fonte da página.';
-      msg.className = 'form-msg error';
-      return;
-    }
-
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando…';
 
-    var data = new FormData(form);
+    var fd = new FormData(form);
     var protocol = makeProtocol();
-    data.append('protocolo', protocol);
+    var fileProposta = document.getElementById('f-arquivo').files[0];
+    var fileDeclaracao = document.getElementById('f-arquivo-2').files[0];
+    var pathProposta = protocol + '/proposta-' + sanitizeFilename(fileProposta.name);
+    var pathDeclaracao = protocol + '/declaracao-' + sanitizeFilename(fileDeclaracao.name);
 
-    fetch(endpoint, {
-      method: 'POST',
-      body: data,
-      headers: { 'Accept': 'application/json' }
-    }).then(function(res){
-      if(res.ok){
-        protocolEl.textContent = protocol;
-        form.classList.add('leaving');
-        var prefersMotion = window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
-        var delay = prefersMotion ? 250 : 0;
-        setTimeout(function(){
-          form.style.display = 'none';
-          successPanel.classList.add('show');
-          requestAnimationFrame(function(){
-            requestAnimationFrame(function(){ successPanel.classList.add('in'); });
-          });
-        }, delay);
-      } else {
-        throw new Error('bad_status');
-      }
-    }).catch(function(){
-      msg.textContent = 'Não foi possível enviar agora. Tente novamente ou escreva para flimla@institutomaelalu.org anexando o arquivo da proposta.';
+    supabaseClient.storage.from('inscricoes-arquivos').upload(pathProposta, fileProposta)
+      .then(function(up1){
+        if(up1.error) throw up1.error;
+        return supabaseClient.storage.from('inscricoes-arquivos').upload(pathDeclaracao, fileDeclaracao);
+      })
+      .then(function(up2){
+        if(up2.error) throw up2.error;
+        return supabaseClient.from('inscricoes').insert({
+          protocolo: protocol,
+          nome_escola: fd.get('nome_escola'),
+          comunidade: fd.get('comunidade'),
+          email_escola: fd.get('email_escola') || null,
+          telefone_escola: fd.get('telefone_escola') || null,
+          titulo_proposta: fd.get('titulo_proposta'),
+          oferta: fd.getAll('oferta'),
+          contemplada_ppp: fd.get('contemplada_ppp') || null,
+          atuacao: fd.getAll('atuacao'),
+          telefone_responsavel: fd.get('telefone_responsavel'),
+          email_responsavel: fd.get('email_responsavel') || null,
+          rg_responsavel: fd.get('rg_responsavel') || null,
+          redes_sociais: fd.get('redes_sociais') || null,
+          municipio_residencia: fd.get('municipio_residencia') || null,
+          genero: fd.get('genero') || null,
+          raca_cor: fd.get('raca_cor') || null,
+          formato: fd.get('formato'),
+          faixa_etaria: fd.get('faixa_etaria') || null,
+          qt_estudantes: intOrNull(fd.get('qt_estudantes')),
+          qt_professores: intOrNull(fd.get('qt_professores')),
+          qt_gestao: intOrNull(fd.get('qt_gestao')),
+          qt_colaboradores: intOrNull(fd.get('qt_colaboradores')),
+          arquivo_proposta_path: pathProposta,
+          arquivo_declaracao_path: pathDeclaracao,
+          declaracao_veracidade: fd.get('declaracao_veracidade') === 'on'
+        });
+      })
+      .then(function(ins){
+        if(ins.error) throw ins.error;
+        showSuccess(protocol);
+      })
+      .catch(function(){
+      msg.textContent = 'Não foi possível enviar agora. Tente novamente ou escreva para flimla@institutomaelalu.org anexando os arquivos.';
       msg.className = 'form-msg error';
       submitBtn.disabled = false;
       submitBtn.textContent = 'Enviar inscrição';
