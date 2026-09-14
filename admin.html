@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Inscrições — Flimlá 2026</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root{
+    --brown: #663821;
+    --brown-deep: #4a2717;
+    --cream: #F1ECE6;
+    --panel: #ffffff;
+    --line: #ded4c7;
+    --olive: #98BA42;
+    --turq: #5BC6D0;
+    --turq-dark: #3f9aa3;
+    --ink: #3a2115;
+    --ink-soft: #6b5647;
+    --focus: #2f7f88;
+    --danger: #a5402b;
+    --font: 'Nunito', 'Segoe UI', sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --brown: #e7cdb8; --brown-deep: #f1ddce; --cream: #1c130f; --panel: #2a1c15;
+      --line: #4a3527; --olive: #b7d968; --turq: #7fd6df; --turq-dark: #58b9c2;
+      --ink: #f1ece6; --ink-soft: #cfbeae; --focus: #7fd6df; --danger: #e08a72;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh;
+    background:var(--cream); color:var(--ink);
+    font-family:var(--font); font-size:15px; line-height:1.5;
+  }
+  .topbar{
+    background:var(--brown); color:var(--cream);
+    padding:16px 24px; display:flex; align-items:center; justify-content:space-between;
+  }
+  .topbar h1{ font-size:1.05rem; font-weight:800; margin:0; }
+  .topbar .sub{ font-size:.78rem; opacity:.8; }
+  .btn{
+    font-family:var(--font); font-weight:700; font-size:.85rem;
+    border-radius:999px; padding:9px 18px; border:1.5px solid transparent;
+    cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn-primary{ background:var(--turq); color:var(--brown-deep); }
+  .btn-outline{ background:transparent; color:var(--cream); border-color:rgba(241,236,230,.5); }
+  .btn:disabled{ opacity:.6; cursor:not-allowed; }
+  .btn-sm{ padding:6px 13px; font-size:.78rem; }
+
+  /* ---- login ---- */
+  #login-view{
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .login-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:20px;
+    padding:36px 32px; width:100%; max-width:380px;
+  }
+  .login-card h1{ font-size:1.3rem; margin:0 0 6px; color:var(--brown); font-weight:800; }
+  .login-card p{ margin:0 0 24px; color:var(--ink-soft); font-size:.9rem; }
+  .field{ display:flex; flex-direction:column; gap:5px; margin-bottom:16px; }
+  .field label{ font-size:.8rem; font-weight:700; color:var(--brown); }
+  .field input{
+    font-family:var(--font); font-size:.95rem; padding:10px 12px;
+    border-radius:10px; border:1.5px solid var(--line); background:var(--cream); color:var(--ink);
+  }
+  .field input:focus{ outline:none; border-color:var(--focus); }
+  .login-msg{ font-size:.85rem; color:var(--danger); min-height:1.2em; margin-bottom:8px; }
+
+  /* ---- dashboard ---- */
+  #dashboard-view{ display:none; }
+  .container{ max-width:1200px; margin:0 auto; padding:28px 24px 60px; }
+  .stats-row{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
+  .stat{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:16px 20px; min-width:150px;
+  }
+  .stat .num{ font-size:1.6rem; font-weight:800; color:var(--brown); font-variant-numeric:tabular-nums; }
+  .stat .label{ font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); font-weight:700; }
+
+  .toolbar{ display:flex; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+  .toolbar input[type="search"]{
+    font-family:var(--font); font-size:.9rem; padding:9px 14px; border-radius:10px;
+    border:1.5px solid var(--line); background:var(--panel); color:var(--ink); flex:1; min-width:220px;
+  }
+
+  .table-wrap{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    overflow-x:auto;
+  }
+  table{ width:100%; border-collapse:collapse; font-size:.86rem; white-space:nowrap; }
+  th, td{ padding:11px 14px; text-align:left; border-bottom:1px solid var(--line); }
+  th{
+    font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft);
+    font-weight:700; position:sticky; top:0; background:var(--panel);
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:var(--cream); }
+  td.wrap{ white-space:normal; max-width:260px; }
+  .protocolo{ font-weight:700; color:var(--brown); font-variant-numeric:tabular-nums; }
+  .file-links{ display:flex; gap:8px; }
+  .file-btn{
+    font-size:.78rem; font-weight:700; color:var(--focus); background:none; border:1.5px solid var(--line);
+    border-radius:8px; padding:5px 10px; cursor:pointer; font-family:var(--font);
+  }
+  .file-btn:hover{ border-color:var(--focus); }
+  .empty, .loading, .error-state{
+    text-align:center; padding:60px 20px; color:var(--ink-soft); font-size:.95rem;
+  }
+  .error-state{ color:var(--danger); }
+</style>
+</head>
+<body>
+
+<div id="login-view">
+  <div class="login-card">
+    <h1>Painel de Inscrições</h1>
+    <p>Flimlá 2026 — acesso restrito à equipe do Instituto.</p>
+    <p class="login-msg" id="login-msg"></p>
+    <form id="login-form">
+      <div class="field">
+        <label for="login-email">E-mail</label>
+        <input type="email" id="login-email" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="login-password">Senha</label>
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary" id="login-btn" style="width:100%; justify-content:center;">Entrar</button>
+    </form>
+  </div>
+</div>
+
+<div id="dashboard-view">
+  <div class="topbar">
+    <div>
+      <h1>Painel de Inscrições</h1>
+      <div class="sub">Edital 001/2026 · Flimlá</div>
+    </div>
+    <button class="btn btn-outline" id="logout-btn">Sair</button>
+  </div>
+
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat"><div class="num" id="stat-total">—</div><div class="label">Inscrições recebidas</div></div>
+    </div>
+
+    <div class="toolbar">
+      <input type="search" id="search-input" placeholder="Buscar por escola, comunidade ou proposta…">
+      <button class="btn btn-outline" id="refresh-btn" style="color:var(--brown); border-color:var(--line);">Atualizar</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="data-table" style="display:none;">
+        <thead>
+          <tr>
+            <th>Protocolo</th>
+            <th>Recebido em</th>
+            <th>Escola</th>
+            <th>Comunidade</th>
+            <th>Proposta</th>
+            <th>Formato</th>
+            <th>Responsável</th>
+            <th>Arquivos</th>
+          </tr>
+        </thead>
+        <tbody id="data-tbody"></tbody>
+      </table>
+      <div class="loading" id="loading-state">Carregando inscrições…</div>
+      <div class="empty" id="empty-state" style="display:none;">Nenhuma inscrição recebida ainda.</div>
+      <div class="error-state" id="error-state" style="display:none;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var SUPABASE_URL = 'https://uklgjivsgljvkfvdnnqi.supabase.co';
+  var SUPABASE_KEY = 'sb_publishable_AJ0oX91NPtyzCgPgAvhOUQ_ojqi2tc4';
+  var supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  var loginView = document.getElementById('login-view');
+  var dashboardView = document.getElementById('dashboard-view');
+  var loginForm = document.getElementById('login-form');
+  var loginMsg = document.getElementById('login-msg');
+  var loginBtn = document.getElementById('login-btn');
+  var logoutBtn = document.getElementById('logout-btn');
+  var searchInput = document.getElementById('search-input');
+  var refreshBtn = document.getElementById('refresh-btn');
+  var dataTable = document.getElementById('data-table');
+  var dataTbody = document.getElementById('data-tbody');
+  var loadingState = document.getElementById('loading-state');
+  var emptyState = document.getElementById('empty-state');
+  var errorState = document.getElementById('error-state');
+  var statTotal = document.getElementById('stat-total');
+
+  var allRows = [];
+
+  function fmtDate(iso){
+    try{
+      return new Date(iso).toLocaleString('pt-BR', {dateStyle:'short', timeStyle:'short'});
+    } catch(e){ return iso; }
+  }
+
+  function showDashboard(){
+    loginView.style.display = 'none';
+    dashboardView.style.display = 'block';
+    loadInscricoes();
+  }
+
+  function showLogin(){
+    dashboardView.style.display = 'none';
+    loginView.style.display = 'flex';
+  }
+
+  supabaseClient.auth.getSession().then(function(res){
+    if(res.data.session){ showDashboard(); } else { showLogin(); }
+  });
+
+  loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    loginMsg.textContent = '';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Entrando…';
+    var email = document.getElementById('login-email').value;
+    var password = document.getElementById('login-password').value;
+    supabaseClient.auth.signInWithPassword({email: email, password: password}).then(function(res){
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Entrar';
+      if(res.error){
+        loginMsg.textContent = 'E-mail ou senha incorretos.';
+        return;
+      }
+      showDashboard();
+    });
+  });
+
+  logoutBtn.addEventListener('click', function(){
+    supabaseClient.auth.signOut().then(function(){ showLogin(); });
+  });
+
+  async function downloadFile(path, btn){
+    var originalText = btn.textContent;
+    btn.textContent = '…';
+    btn.disabled = true;
+    var res = await supabaseClient.storage.from('inscricoes-arquivos').createSignedUrl(path, 300);
+    btn.disabled = false;
+    btn.textContent = originalText;
+    if(res.error || !res.data){
+      alert('Não foi possível gerar o link do arquivo agora. Tente de novo.');
+      return;
+    }
+    window.open(res.data.signedUrl, '_blank', 'noopener');
+  }
+
+  function renderRows(rows){
+    dataTbody.innerHTML = '';
+    if(rows.length === 0){
+      dataTable.style.display = 'none';
+      emptyState.style.display = 'block';
+      return;
+    }
+    emptyState.style.display = 'none';
+    dataTable.style.display = 'table';
+    rows.forEach(function(row){
+      var tr = document.createElement('tr');
+
+      var tdProt = document.createElement('td');
+      tdProt.className = 'protocolo';
+      tdProt.textContent = row.protocolo || '—';
+      tr.appendChild(tdProt);
+
+      var tdDate = document.createElement('td');
+      tdDate.textContent = fmtDate(row.created_at);
+      tr.appendChild(tdDate);
+
+      var tdEscola = document.createElement('td');
+      tdEscola.className = 'wrap';
+      tdEscola.textContent = row.nome_escola || '—';
+      tr.appendChild(tdEscola);
+
+      var tdComunidade = document.createElement('td');
+      tdComunidade.className = 'wrap';
+      tdComunidade.textContent = row.comunidade || '—';
+      tr.appendChild(tdComunidade);
+
+      var tdProposta = document.createElement('td');
+      tdProposta.className = 'wrap';
+      tdProposta.textContent = row.titulo_proposta || '—';
+      tr.appendChild(tdProposta);
+
+      var tdFormato = document.createElement('td');
+      tdFormato.textContent = row.formato || '—';
+      tr.appendChild(tdFormato);
+
+      var tdResp = document.createElement('td');
+      tdResp.className = 'wrap';
+      var respLines = [row.telefone_responsavel, row.email_responsavel].filter(Boolean).join(' · ');
+      tdResp.textContent = respLines || '—';
+      tr.appendChild(tdResp);
+
+      var tdFiles = document.createElement('td');
+      var wrap = document.createElement('div');
+      wrap.className = 'file-links';
+      if(row.arquivo_proposta_path){
+        var b1 = document.createElement('button');
+        b1.className = 'file-btn';
+        b1.textContent = 'Proposta';
+        b1.addEventListener('click', function(){ downloadFile(row.arquivo_proposta_path, b1); });
+        wrap.appendChild(b1);
+      }
+      if(row.arquivo_declaracao_path){
+        var b2 = document.createElement('button');
+        b2.className = 'file-btn';
+        b2.textContent = 'Declaração';
+        b2.addEventListener('click', function(){ downloadFile(row.arquivo_declaracao_path, b2); });
+        wrap.appendChild(b2);
+      }
+      tdFiles.appendChild(wrap);
+      tr.appendChild(tdFiles);
+
+      dataTbody.appendChild(tr);
+    });
+  }
+
+  function applyFilter(){
+    var q = searchInput.value.trim().toLowerCase();
+    if(!q){ renderRows(allRows); return; }
+    var filtered = allRows.filter(function(row){
+      return [row.nome_escola, row.comunidade, row.titulo_proposta]
+        .filter(Boolean)
+        .some(function(v){ return v.toLowerCase().indexOf(q) !== -1; });
+    });
+    renderRows(filtered);
+  }
+
+  searchInput.addEventListener('input', applyFilter);
+  refreshBtn.addEventListener('click', loadInscricoes);
+
+  function loadInscricoes(){
+    loadingState.style.display = 'block';
+    errorState.style.display = 'none';
+    emptyState.style.display = 'none';
+    dataTable.style.display = 'none';
+
+    supabaseClient.from('inscricoes').select('*').order('created_at', {ascending: false}).then(function(res){
+      loadingState.style.display = 'none';
+      if(res.error){
+        errorState.textContent = 'Não foi possível carregar as inscrições agora. Tente atualizar a página.';
+        errorState.style.display = 'block';
+        return;
+      }
+      allRows = res.data || [];
+      statTotal.textContent = allRows.length;
+      applyFilter();
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
