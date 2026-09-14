@@ -115,6 +115,37 @@
     text-align:center; padding:60px 20px; color:var(--ink-soft); font-size:.95rem;
   }
   .error-state{ color:var(--danger); }
+
+  /* ---- modal de detalhes ---- */
+  .modal-backdrop{
+    display:none; position:fixed; inset:0; background:rgba(30,18,12,.55);
+    align-items:flex-start; justify-content:center; padding:40px 20px; overflow-y:auto; z-index:50;
+  }
+  .modal-backdrop.show{ display:flex; }
+  .modal-card{
+    background:var(--panel); border-radius:18px; width:100%; max-width:640px;
+    padding:28px 30px 30px; box-shadow:0 20px 60px -20px rgba(0,0,0,.4);
+  }
+  .modal-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:6px; }
+  .modal-head h2{ font-size:1.15rem; margin:0; color:var(--brown); font-weight:800; }
+  .modal-close{
+    background:none; border:none; font-size:1.3rem; line-height:1; cursor:pointer;
+    color:var(--ink-soft); padding:4px 8px; border-radius:8px;
+  }
+  .modal-close:hover{ background:var(--cream); }
+  .modal-protocolo{ font-size:.8rem; color:var(--ink-soft); margin-bottom:20px; font-variant-numeric:tabular-nums; }
+  .detail-section{ margin-bottom:20px; }
+  .detail-section:last-child{ margin-bottom:0; }
+  .detail-section h3{
+    font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; color:var(--turq-dark);
+    font-weight:800; margin:0 0 10px; border-bottom:1px solid var(--line); padding-bottom:6px;
+  }
+  .detail-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; }
+  .detail-item.full{ grid-column:1/-1; }
+  .detail-item label{ display:block; font-size:.72rem; font-weight:700; color:var(--ink-soft); margin-bottom:2px; }
+  .detail-item .val{ font-size:.92rem; color:var(--ink); }
+  .modal-files{ display:flex; gap:10px; margin-top:22px; }
+  tbody tr{ cursor:pointer; }
 </style>
 </head>
 <body>
@@ -180,6 +211,17 @@
   </div>
 </div>
 
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="modal-title">Inscrição</h2>
+      <button class="modal-close" id="modal-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-protocolo" id="modal-protocolo"></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
 <script>
 (function(){
   var SUPABASE_URL = 'https://uklgjivsgljvkfvdnnqi.supabase.co';
@@ -200,8 +242,120 @@
   var emptyState = document.getElementById('empty-state');
   var errorState = document.getElementById('error-state');
   var statTotal = document.getElementById('stat-total');
+  var modalBackdrop = document.getElementById('modal-backdrop');
+  var modalTitle = document.getElementById('modal-title');
+  var modalProtocolo = document.getElementById('modal-protocolo');
+  var modalBody = document.getElementById('modal-body');
+  var modalClose = document.getElementById('modal-close');
 
   var allRows = [];
+
+  var FIELD_LABELS = {
+    email_escola: 'E-mail da escola',
+    telefone_escola: 'Telefone/WhatsApp da escola',
+    oferta: 'Oferta(s) da escola',
+    contemplada_ppp: 'Contemplada no Projeto PPP?',
+    atuacao: 'Atuação do(a) responsável',
+    telefone_responsavel: 'Contato do(a) responsável',
+    email_responsavel: 'E-mail do(a) responsável',
+    rg_responsavel: 'RG do(a) responsável',
+    redes_sociais: 'Redes sociais',
+    municipio_residencia: 'Município/comunidade onde reside',
+    genero: 'Gênero do(a) responsável',
+    raca_cor: 'Raça/cor autodeclarada',
+    formato: 'Formato da apresentação',
+    faixa_etaria: 'Faixa etária dos estudantes',
+    qt_estudantes: 'Estudantes',
+    qt_professores: 'Professores',
+    qt_gestao: 'Equipe gestora',
+    qt_colaboradores: 'Colaboradores',
+    declaracao_veracidade: 'Declarou informações verdadeiras'
+  };
+
+  function fmtValue(v){
+    if(v === null || v === undefined || v === '') return '—';
+    if(Array.isArray(v)) return v.length ? v.join(', ') : '—';
+    if(typeof v === 'boolean') return v ? 'Sim' : 'Não';
+    return String(v);
+  }
+
+  function buildDetailItem(key, row, full){
+    var item = document.createElement('div');
+    item.className = 'detail-item' + (full ? ' full' : '');
+    var label = document.createElement('label');
+    label.textContent = FIELD_LABELS[key] || key;
+    var val = document.createElement('div');
+    val.className = 'val';
+    val.textContent = fmtValue(row[key]);
+    item.appendChild(label);
+    item.appendChild(val);
+    return item;
+  }
+
+  function buildSection(title, fields, row, fullKeys){
+    var section = document.createElement('div');
+    section.className = 'detail-section';
+    var h3 = document.createElement('h3');
+    h3.textContent = title;
+    section.appendChild(h3);
+    var grid = document.createElement('div');
+    grid.className = 'detail-grid';
+    fields.forEach(function(key){
+      grid.appendChild(buildDetailItem(key, row, (fullKeys || []).indexOf(key) !== -1));
+    });
+    section.appendChild(grid);
+    return section;
+  }
+
+  function openDetail(row){
+    modalTitle.textContent = row.nome_escola || 'Inscrição';
+    modalProtocolo.textContent = 'Protocolo ' + (row.protocolo || '—') + ' · recebido em ' + fmtDate(row.created_at);
+    modalBody.innerHTML = '';
+
+    modalBody.appendChild(buildSection('Identificação', [
+      'email_escola', 'telefone_escola'
+    ], row));
+
+    modalBody.appendChild(buildSection('Sobre a escola e o(a) responsável', [
+      'oferta', 'contemplada_ppp', 'atuacao', 'telefone_responsavel', 'email_responsavel',
+      'rg_responsavel', 'genero', 'raca_cor', 'redes_sociais', 'municipio_residencia'
+    ], row, ['oferta', 'atuacao']));
+
+    modalBody.appendChild(buildSection('Proposta / experiência', [
+      'formato', 'faixa_etaria', 'qt_estudantes', 'qt_professores', 'qt_gestao', 'qt_colaboradores'
+    ], row));
+
+    modalBody.appendChild(buildSection('Consentimento', ['declaracao_veracidade'], row));
+
+    var filesRow = document.createElement('div');
+    filesRow.className = 'modal-files';
+    if(row.arquivo_proposta_path){
+      var fb1 = document.createElement('button');
+      fb1.className = 'btn btn-primary btn-sm';
+      fb1.textContent = 'Baixar proposta';
+      fb1.addEventListener('click', function(){ downloadFile(row.arquivo_proposta_path, fb1); });
+      filesRow.appendChild(fb1);
+    }
+    if(row.arquivo_declaracao_path){
+      var fb2 = document.createElement('button');
+      fb2.className = 'btn btn-primary btn-sm';
+      fb2.textContent = 'Baixar declaração';
+      fb2.addEventListener('click', function(){ downloadFile(row.arquivo_declaracao_path, fb2); });
+      filesRow.appendChild(fb2);
+    }
+    modalBody.appendChild(filesRow);
+
+    modalBackdrop.classList.add('show');
+  }
+
+  function closeDetail(){ modalBackdrop.classList.remove('show'); }
+  modalClose.addEventListener('click', closeDetail);
+  modalBackdrop.addEventListener('click', function(e){
+    if(e.target === modalBackdrop) closeDetail();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeDetail();
+  });
 
   function fmtDate(iso){
     try{
@@ -313,18 +467,19 @@
         var b1 = document.createElement('button');
         b1.className = 'file-btn';
         b1.textContent = 'Proposta';
-        b1.addEventListener('click', function(){ downloadFile(row.arquivo_proposta_path, b1); });
+        b1.addEventListener('click', function(e){ e.stopPropagation(); downloadFile(row.arquivo_proposta_path, b1); });
         wrap.appendChild(b1);
       }
       if(row.arquivo_declaracao_path){
         var b2 = document.createElement('button');
         b2.className = 'file-btn';
         b2.textContent = 'Declaração';
-        b2.addEventListener('click', function(){ downloadFile(row.arquivo_declaracao_path, b2); });
+        b2.addEventListener('click', function(e){ e.stopPropagation(); downloadFile(row.arquivo_declaracao_path, b2); });
         wrap.appendChild(b2);
       }
       tdFiles.appendChild(wrap);
       tr.appendChild(tdFiles);
+      tr.addEventListener('click', function(){ openDetail(row); });
 
       dataTbody.appendChild(tr);
     });
