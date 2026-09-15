@@ -947,12 +947,12 @@
             <input type="text" id="f-comunidade" name="comunidade" required>
           </div>
           <div class="field">
-            <label for="f-email-escola">E-mail da escola</label>
-            <input type="email" id="f-email-escola" name="email_escola" autocomplete="email">
+            <label for="f-email-escola">E-mail da escola *</label>
+            <input type="email" id="f-email-escola" name="email_escola" autocomplete="email" required>
           </div>
           <div class="field">
-            <label for="f-tel-escola">Telefone/WhatsApp da escola ou responsável</label>
-            <input type="tel" id="f-tel-escola" name="telefone_escola">
+            <label for="f-tel-escola">Telefone/WhatsApp da escola ou responsável *</label>
+            <input type="tel" id="f-tel-escola" name="telefone_escola" required>
           </div>
           <div class="field full">
             <label for="f-titulo">Título da proposta a ser compartilhada *</label>
@@ -965,7 +965,7 @@
         <div class="form-section-head"><span class="letter">B</span><h3>Outras informações da escola</h3></div>
         <div class="field-grid">
           <div class="field full">
-            <label>Oferta(s) da escola</label>
+            <label>Oferta(s) da escola *</label>
             <div class="choice-group">
               <label class="choice"><input type="checkbox" name="oferta" value="Educação Infantil"> Educação Infantil</label>
               <label class="choice"><input type="checkbox" name="oferta" value="Ensino Fundamental – anos iniciais"> Ens. Fundamental – anos iniciais</label>
@@ -974,14 +974,14 @@
             </div>
           </div>
           <div class="field full">
-            <label>A escola foi contemplada no Projeto (Re)elaboração do PPP: Tecendo fios e caminhos nas escolas quilombolas?</label>
+            <label>A escola foi contemplada no Projeto (Re)elaboração do PPP: Tecendo fios e caminhos nas escolas quilombolas? *</label>
             <div class="choice-group">
-              <label class="choice"><input type="radio" name="contemplada_ppp" value="Sim"> Sim</label>
+              <label class="choice"><input type="radio" name="contemplada_ppp" value="Sim" required> Sim</label>
               <label class="choice"><input type="radio" name="contemplada_ppp" value="Não"> Não</label>
             </div>
           </div>
           <div class="field full">
-            <label>Atuação do(a) responsável pela proposta</label>
+            <label>Atuação do(a) responsável pela proposta *</label>
             <div class="choice-group">
               <label class="choice"><input type="checkbox" name="atuacao" value="Diretor(a)"> Diretor(a)</label>
               <label class="choice"><input type="checkbox" name="atuacao" value="Professor(a)"> Professor(a)</label>
@@ -995,33 +995,33 @@
             <input type="tel" id="f-tel-resp" name="telefone_responsavel" required>
           </div>
           <div class="field">
-            <label for="f-email-resp">E-mail da pessoa responsável</label>
-            <input type="email" id="f-email-resp" name="email_responsavel">
+            <label for="f-email-resp">E-mail da pessoa responsável *</label>
+            <input type="email" id="f-email-resp" name="email_responsavel" required>
           </div>
           <div class="field">
-            <label for="f-rg">RG da pessoa responsável</label>
-            <input type="text" id="f-rg" name="rg_responsavel">
+            <label for="f-rg">RG da pessoa responsável *</label>
+            <input type="text" id="f-rg" name="rg_responsavel" required>
           </div>
           <div class="field">
             <label for="f-redes">Redes sociais</label>
             <input type="text" id="f-redes" name="redes_sociais" placeholder="@usuario">
           </div>
           <div class="field full">
-            <label for="f-municipio">Município/comunidade onde reside</label>
-            <input type="text" id="f-municipio" name="municipio_residencia">
+            <label for="f-municipio">Município/comunidade onde reside *</label>
+            <input type="text" id="f-municipio" name="municipio_residencia" required>
           </div>
           <div class="field full">
-            <label>Gênero da pessoa responsável <span class="hint">(marque 1 opção)</span></label>
+            <label>Gênero da pessoa responsável <span class="hint">(marque 1 opção)</span> *</label>
             <div class="choice-group">
-              <label class="choice"><input type="radio" name="genero" value="Masculino"> Masculino</label>
+              <label class="choice"><input type="radio" name="genero" value="Masculino" required> Masculino</label>
               <label class="choice"><input type="radio" name="genero" value="Feminino"> Feminino</label>
               <label class="choice"><input type="radio" name="genero" value="Não binário"> Não binário</label>
             </div>
           </div>
           <div class="field full">
-            <label>Raça/cor autodeclarada da pessoa responsável <span class="hint">(marque 1 opção)</span></label>
+            <label>Raça/cor autodeclarada da pessoa responsável <span class="hint">(marque 1 opção)</span> *</label>
             <div class="choice-group">
-              <label class="choice"><input type="radio" name="raca_cor" value="Indígena"> Indígena</label>
+              <label class="choice"><input type="radio" name="raca_cor" value="Indígena" required> Indígena</label>
               <label class="choice"><input type="radio" name="raca_cor" value="Preta"> Preta</label>
               <label class="choice"><input type="radio" name="raca_cor" value="Parda"> Parda</label>
               <label class="choice"><input type="radio" name="raca_cor" value="Amarela"> Amarela</label>
@@ -1065,7 +1065,7 @@
         <div class="form-section-head"><span class="letter">D</span><h3>Sobre o público da apresentação</h3></div>
         <div class="field-grid">
           <div class="field full">
-            <label>Faixa etária dos estudantes participantes <span class="hint">(marque 1 ou mais opções — pode ser um grupo com faixas etárias diferentes)</span></label>
+            <label>Faixa etária dos estudantes participantes <span class="hint">(marque 1 ou mais opções — pode ser um grupo com faixas etárias diferentes)</span> *</label>
             <div class="choice-group">
               <label class="choice"><input type="checkbox" name="faixa_etaria" value="04 a 06 anos"> 04 a 06 anos</label>
               <label class="choice"><input type="checkbox" name="faixa_etaria" value="06 a 08 anos"> 06 a 08 anos</label>
@@ -1077,23 +1077,23 @@
             </div>
           </div>
           <div class="field full">
-            <label>Quantidade prevista de participantes <span class="hint">(máximo 40 no total)</span></label>
+            <label>Quantidade prevista de participantes <span class="hint">(máximo 40 no total)</span> *</label>
             <div class="count-grid">
               <div class="field">
                 <label for="f-qt-estudantes" class="hint">Estudantes</label>
-                <input type="number" id="f-qt-estudantes" name="qt_estudantes" min="0" max="40">
+                <input type="number" id="f-qt-estudantes" name="qt_estudantes" min="0" max="40" required>
               </div>
               <div class="field">
                 <label for="f-qt-professores" class="hint">Professores</label>
-                <input type="number" id="f-qt-professores" name="qt_professores" min="0" max="40">
+                <input type="number" id="f-qt-professores" name="qt_professores" min="0" max="40" required>
               </div>
               <div class="field">
                 <label for="f-qt-gestao" class="hint">Equipe gestora</label>
-                <input type="number" id="f-qt-gestao" name="qt_gestao" min="0" max="40">
+                <input type="number" id="f-qt-gestao" name="qt_gestao" min="0" max="40" required>
               </div>
               <div class="field">
                 <label for="f-qt-colab" class="hint">Colaboradores</label>
-                <input type="number" id="f-qt-colab" name="qt_colaboradores" min="0" max="40">
+                <input type="number" id="f-qt-colab" name="qt_colaboradores" min="0" max="40" required>
               </div>
             </div>
             <p class="hint" id="count-total-hint">Total informado: 0 de 40</p>
@@ -1274,6 +1274,17 @@
     var n = parseInt(v, 10);
     return isNaN(n) ? null : n;
   }
+
+  ['oferta', 'atuacao', 'faixa_etaria'].forEach(function(groupName){
+    var boxes = form.querySelectorAll('input[name="' + groupName + '"]');
+    if(!boxes.length) return;
+    function updateGroupValidity(){
+      var anyChecked = Array.prototype.some.call(boxes, function(b){ return b.checked; });
+      boxes[0].setCustomValidity(anyChecked ? '' : 'Selecione ao menos uma opção.');
+    }
+    boxes.forEach(function(b){ b.addEventListener('change', updateGroupValidity); });
+    updateGroupValidity();
+  });
 
   form.addEventListener('submit', function(e){
     e.preventDefault();
