@@ -852,15 +852,15 @@
         </div>
         <div class="stage stage-2">
           <div class="stage-header"><span class="num">II · Seleção</span><h3>Comissão avalia</h3></div>
-          <p>Uma comissão analisa as propostas e escolhe as 6 escolas participantes.</p>
+          <p>Uma comissão analisa as propostas e escolhe as 6 escolas que irão participar da festa literária.</p>
         </div>
         <div class="stage stage-3">
           <div class="stage-header"><span class="num">III · Resultado</span><h3>Convocação</h3></div>
-          <p>Escolas selecionadas são chamadas para apresentar o plano operacional da proposta.</p>
+          <p>Escolas selecionadas serão chamadas para apresentar o plano operacional da proposta.</p>
         </div>
         <div class="stage stage-4">
           <div class="stage-header"><span class="num">IV · Execução</span><h3>7 de novembro</h3></div>
-          <p>Dia da Flimlá: cada escola apresenta sua experiência no tempo definido pelo formato escolhido.</p>
+          <p>Dia da Flimlá: cada escola apresentará sua experiência no tempo definido pelo formato escolhido.</p>
         </div>
       </div>
     </div>
@@ -874,17 +874,17 @@
       <div class="stage">
         <div class="stage-header"><span class="num">II · Seleção</span></div>
         <h3>Comissão avalia</h3>
-        <p>Uma comissão analisa as propostas e escolhe as 6 escolas participantes.</p>
+        <p>Uma comissão analisa as propostas e escolhe as 6 escolas que irão participar da festa literária.</p>
       </div>
       <div class="stage">
         <div class="stage-header"><span class="num">III · Resultado</span></div>
         <h3>Convocação</h3>
-        <p>Escolas selecionadas são chamadas para apresentar o plano operacional da proposta.</p>
+        <p>Escolas selecionadas serão chamadas para apresentar o plano operacional da proposta.</p>
       </div>
       <div class="stage">
         <div class="stage-header"><span class="num">IV · Execução · 7 de novembro</span></div>
         <h3>Dia da Flimlá</h3>
-        <p>Cada escola apresenta sua experiência no tempo definido pelo formato escolhido, num espaço cedido pelo Instituto (limite de 40 participantes por escola).</p>
+        <p>Cada escola apresentará sua experiência no tempo definido pelo formato escolhido, num espaço cedido pelo Instituto (limite de 40 participantes por escola).</p>
       </div>
     </div>
 
@@ -1065,15 +1065,15 @@
         <div class="form-section-head"><span class="letter">D</span><h3>Sobre o público da apresentação</h3></div>
         <div class="field-grid">
           <div class="field full">
-            <label>Faixa etária dos estudantes participantes <span class="hint">(marque 1 opção)</span></label>
+            <label>Faixa etária dos estudantes participantes <span class="hint">(marque 1 ou mais opções — pode ser um grupo com faixas etárias diferentes)</span></label>
             <div class="choice-group">
-              <label class="choice"><input type="radio" name="faixa_etaria" value="04 a 06 anos"> 04 a 06 anos</label>
-              <label class="choice"><input type="radio" name="faixa_etaria" value="06 a 08 anos"> 06 a 08 anos</label>
-              <label class="choice"><input type="radio" name="faixa_etaria" value="06 a 10 anos"> 06 a 10 anos</label>
-              <label class="choice"><input type="radio" name="faixa_etaria" value="10 a 12 anos"> 10 a 12 anos</label>
-              <label class="choice"><input type="radio" name="faixa_etaria" value="12 a 14 anos"> 12 a 14 anos</label>
-              <label class="choice"><input type="radio" name="faixa_etaria" value="14 a 17 anos"> 14 a 17 anos</label>
-              <label class="choice"><input type="radio" name="faixa_etaria" value="maiores de 17 anos"> Maiores de 17 anos</label>
+              <label class="choice"><input type="checkbox" name="faixa_etaria" value="04 a 06 anos"> 04 a 06 anos</label>
+              <label class="choice"><input type="checkbox" name="faixa_etaria" value="06 a 08 anos"> 06 a 08 anos</label>
+              <label class="choice"><input type="checkbox" name="faixa_etaria" value="06 a 10 anos"> 06 a 10 anos</label>
+              <label class="choice"><input type="checkbox" name="faixa_etaria" value="10 a 12 anos"> 10 a 12 anos</label>
+              <label class="choice"><input type="checkbox" name="faixa_etaria" value="12 a 14 anos"> 12 a 14 anos</label>
+              <label class="choice"><input type="checkbox" name="faixa_etaria" value="14 a 17 anos"> 14 a 17 anos</label>
+              <label class="choice"><input type="checkbox" name="faixa_etaria" value="maiores de 17 anos"> Maiores de 17 anos</label>
             </div>
           </div>
           <div class="field full">
@@ -1320,7 +1320,7 @@
           genero: fd.get('genero') || null,
           raca_cor: fd.get('raca_cor') || null,
           formato: fd.get('formato'),
-          faixa_etaria: fd.get('faixa_etaria') || null,
+          faixa_etaria: fd.getAll('faixa_etaria').join(', ') || null,
           qt_estudantes: intOrNull(fd.get('qt_estudantes')),
           qt_professores: intOrNull(fd.get('qt_professores')),
           qt_gestao: intOrNull(fd.get('qt_gestao')),
