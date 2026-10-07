@@ -97,7 +97,7 @@ module.exports = async function handler(req, res) {
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:22px;">
       ${detailRow('Protocolo', row.protocolo)}
       ${detailRow('Escola', row.nome_escola)}
-      ${detailRow('Comunidade', row.comunidade)}
+      ${detailRow('Município', row.comunidade)}
       ${detailRow('Título da proposta', row.titulo_proposta)}
       ${detailRow('Formato', row.formato)}
       ${detailRow('Responsável', [row.telefone_responsavel, row.email_responsavel].filter(Boolean).join(' · '))}
