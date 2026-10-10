@@ -404,11 +404,11 @@
     var originalText = btn.textContent;
     btn.textContent = '…';
     btn.disabled = true;
-    var res = await supabaseClient.storage.from('inscricoes-arquivos').createSignedUrl(path, 300);
+    var res = await supabaseClient.storage.from('inscricoes-arquivos').createSignedUrl(path, 300, { download: path.split('/').pop() });
     btn.disabled = false;
     btn.textContent = originalText;
     if(res.error || !res.data){
-      alert('Não foi possível gerar o link do arquivo agora. Tente de novo.');
+      alert('Não foi possível gerar o link do arquivo agora. Tente de novo. (' + (res.error && res.error.message ? res.error.message : 'sem detalhe') + ')');
       return;
     }
     window.open(res.data.signedUrl, '_blank', 'noopener');
