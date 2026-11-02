@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
   :root{
     --brown: #663821;
@@ -307,6 +308,78 @@
     return section;
   }
 
+  function downloadFicha(row){
+    if(!window.jspdf){ alert('Não foi possível gerar a ficha agora. Recarregue a página e tente de novo.'); return; }
+    var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4' });
+    var W = 210, M = 16, maxW = W - 2 * M, y = 0;
+
+    function band(){
+      doc.setFillColor(102, 56, 33);
+      doc.rect(0, 0, W, 24, 'F');
+      doc.setTextColor(169, 207, 70);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+      doc.text('EDITAL 001/2026', W - M, 10, { align: 'right' });
+      doc.setTextColor(241, 236, 230); doc.setFontSize(12);
+      doc.text('FICHA DE INSCRIÇÃO', W - M, 17, { align: 'right' });
+      doc.setFontSize(13);
+      doc.text('Flimlá 2026', M, 15);
+      y = 34;
+    }
+    function ensure(h){ if(y + h > 285){ doc.addPage(); band(); } }
+    function heading(letter, title){
+      ensure(14);
+      doc.setFillColor(169, 207, 70);
+      doc.rect(M, y - 5, 7, 7, 'F');
+      doc.setTextColor(74, 39, 23); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+      doc.text(letter, M + 3.5, y, { align: 'center' });
+      doc.setTextColor(102, 56, 33); doc.setFontSize(12);
+      doc.text(title, M + 10, y);
+      y += 8;
+    }
+    function field(label, value){
+      var lines = doc.splitTextToSize(fmtValue(value), maxW);
+      ensure(6 + lines.length * 5 + 3);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(63, 154, 163);
+      doc.text(label, M, y);
+      y += 4.5;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5); doc.setTextColor(58, 33, 21);
+      doc.text(lines, M, y);
+      y += lines.length * 5 + 2;
+      doc.setDrawColor(222, 212, 199); doc.line(M, y - 1, W - M, y - 1);
+      y += 2;
+    }
+
+    band();
+    doc.setTextColor(58, 33, 21); doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+    doc.text(row.nome_escola || 'Inscrição', M, y); y += 5.5;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(107, 86, 71);
+    doc.text('Protocolo ' + (row.protocolo || '—') + '  ·  recebida em ' + fmtDate(row.created_at), M, y); y += 9;
+
+    heading('A', 'Identificação');
+    field('Nome da escola', row.nome_escola);
+    field('Município', row.comunidade);
+    field('E-mail da escola', row.email_escola);
+    field('Telefone/WhatsApp da escola ou responsável', row.telefone_escola);
+    field('Título da proposta a ser compartilhada', row.titulo_proposta);
+
+    y += 3; heading('B', 'Outras informações da escola');
+    ['oferta','contemplada_ppp','atuacao','telefone_responsavel','email_responsavel','rg_responsavel','redes_sociais','municipio_residencia','genero','raca_cor'].forEach(function(k){
+      field(FIELD_LABELS[k], row[k]);
+    });
+
+    y += 3; heading('C', 'Proposta / experiência a ser compartilhada');
+    field('Formato da apresentação', row.formato);
+
+    y += 3; heading('D', 'Sobre o público da apresentação');
+    field('Faixa etária dos estudantes participantes', row.faixa_etaria);
+    field('Quantidade prevista de participantes', 'Estudantes: ' + fmtValue(row.qt_estudantes) + '  ·  Professores: ' + fmtValue(row.qt_professores) + '  ·  Equipe gestora: ' + fmtValue(row.qt_gestao) + '  ·  Colaboradores: ' + fmtValue(row.qt_colaboradores));
+
+    y += 3; heading('E', 'Consentimento');
+    field('Declarou que as informações são verdadeiras', row.declaracao_veracidade);
+
+    doc.save('Ficha-' + (row.protocolo || 'inscricao') + '.pdf');
+  }
+
   function openDetail(row){
     modalTitle.textContent = row.nome_escola || 'Inscrição';
     modalProtocolo.textContent = 'Protocolo ' + (row.protocolo || '—') + ' · recebido em ' + fmtDate(row.created_at);
@@ -329,6 +402,11 @@
 
     var filesRow = document.createElement('div');
     filesRow.className = 'modal-files';
+    var fb0 = document.createElement('button');
+    fb0.className = 'btn btn-primary btn-sm';
+    fb0.textContent = 'Baixar ficha de inscrição';
+    fb0.addEventListener('click', function(){ downloadFicha(row); });
+    filesRow.appendChild(fb0);
     if(row.arquivo_proposta_path){
       var fb1 = document.createElement('button');
       fb1.className = 'btn btn-primary btn-sm';
@@ -463,6 +541,11 @@
       var tdFiles = document.createElement('td');
       var wrap = document.createElement('div');
       wrap.className = 'file-links';
+      var b0 = document.createElement('button');
+      b0.className = 'file-btn';
+      b0.textContent = 'Ficha';
+      b0.addEventListener('click', function(e){ e.stopPropagation(); downloadFicha(row); });
+      wrap.appendChild(b0);
       if(row.arquivo_proposta_path){
         var b1 = document.createElement('button');
         b1.className = 'file-btn';
